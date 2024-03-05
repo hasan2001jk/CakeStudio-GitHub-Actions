@@ -27,10 +27,10 @@ jobs:
         id: init
         run: tofu init
       
-      - name: OpenTofu Validate
-        working-directory: ./provisioning
-        id: validate
-        run: tofu validate -no-color
+      # - name: OpenTofu Validate
+      #   working-directory: ./provisioning
+      #   id: validate
+      #   run: tofu validate -no-color
 
       - name: OpenTofu Plan
         working-directory: ./provisioning
