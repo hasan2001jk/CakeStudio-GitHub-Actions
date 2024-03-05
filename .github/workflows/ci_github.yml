@@ -39,6 +39,7 @@ jobs:
           uses: docker/setup-buildx-action@v3
         
         - name: Build database image for testing Application
+          working-directory: ./application
           run: |
             docker build -t postgres:v4 -f ./Dockerfile2 .
         
@@ -51,6 +52,7 @@ jobs:
              docker run -d -p 5432:5432 -e POSTGRES_USER=user -e POSTGRES_PASSWORD=user -e POSTGRES_DB=CakeStudio postgres:v4
         
         - name: Generate Maven Wrapper folder
+          working-directory: ./application
           run: |
             mvn -N io.takari:maven:wrapper
             chmod +x ./mvnw
@@ -67,6 +69,7 @@ jobs:
             SPRING_MAIL_PASSWORD: ${{ secrets.SPRING_MAIL_PASSWORD }}
             SPRING_PROFILES_ACTIVE: development
             MAVEN_OPTS: "-Xmx3000m"
+          working-directory: ./application
           run: |
             mvn clean verify -Pcoverage
             ./mvnw -B verify sonar:sonar -Dsonar.projectKey=hasan2001jk_CakeStudio-GitHub-Actions -Dsonar.organization=hasan2001jk -Dsonar.host.url=https://sonarcloud.io -Pcoverage 
@@ -84,6 +87,7 @@ jobs:
             SPRING_MAIL_PASSWORD: ${{ secrets.SPRING_MAIL_PASSWORD }}
             SPRING_PROFILES_ACTIVE: development
             MAVEN_OPTS: "-Xmx3000m"
+          working-directory: ./application
           run: |
             mvn clean verify -Pcoverage
             mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=CakeStudio -Dsonar.projectName='CakeStudio'
@@ -95,6 +99,7 @@ jobs:
             password: ${{ secrets.DOCKERHUB_TOKEN }}
 
         - name: Build docker image for application
+          working-directory: ./application
           run: docker build -t my_app_img:v4 -f ./Dockerfile1 .
 
         - name: Tagging images 
