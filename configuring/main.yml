@@ -1,0 +1,22 @@
+---
+- name: Setup Kubernetes Cluster
+  hosts: all
+  become: yes
+  roles:
+    - common
+    - containerd
+    - kubernetes
+
+- name: Setup Kubernetes Cluster (MASTER)
+  hosts: master
+  become: yes
+  roles:
+    - master
+
+
+- name: Setup Kubernetes Cluster (WORKER)
+  hosts: worker
+  become: yes
+  roles:
+    - worker
+

@@ -1,0 +1,59 @@
+---
+- name: Remove swapfile from /etc/fstab
+  mount:
+    name: "{{ item }}"
+    fstype: swap
+    state: absent
+  with_items:
+    - swap
+    - none
+
+- name: Disable swap
+  command: swapoff -a
+  when: ansible_swaptotal_mb > 0
+
+- name: Install dependencies
+  apt:
+    name: [ 'apt-transport-https','ca-certificates','curl','gnupg-agent','software-properties-common' ]
+    state: present
+    update_cache: yes
+
+- name: Add Kubernetes gpg key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add Kubernetes software repository
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: kubernetes.list
+    update_cache: yes
+
+- name: Install kubernetes
+  apt:
+    name: [ 'kubelet','kubeadm','kubectl' ]
+    state: present
+    update_cache: yes
+
+- name: Hold kubelet package at current version
+  ansible.builtin.dpkg_selections:
+    name: 'kubelet'
+    selection: hold
+
+- name: Hold kubeadm package at current version
+  ansible.builtin.dpkg_selections:
+    name: 'kubeadm'
+    selection: hold
+
+- name: Hold kubectl package at current version
+  ansible.builtin.dpkg_selections:
+    name: 'kubectl'
+    selection: hold
+
+- name: Start and enable Kubelet (Master & Worker)
+  systemd:
+    name: kubelet
+    enabled: yes
+    state: started
+
