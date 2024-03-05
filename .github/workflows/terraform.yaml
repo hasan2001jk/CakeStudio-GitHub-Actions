@@ -35,7 +35,7 @@ jobs:
       - name: OpenTofu Plan
         working-directory: ./provisioning
         id: plan
-        run: tofu plan -out=tfplan
+        run: tofu plan -out=tfplan -var yandex_token=${{ secrets.YANDEX_TOKEN }} -var yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}
         continue-on-error: true
 
       - uses: actions/github-script@v6
