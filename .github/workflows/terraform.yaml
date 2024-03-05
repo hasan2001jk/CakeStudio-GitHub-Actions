@@ -75,5 +75,5 @@ jobs:
       - name: OpenTofu Apply
         id: apply
         run: tofu apply -auto-approve \
-            -var="token=${{ secrets.YANDEX_TOKEN }}" \
-            -var="cloud_id=${{ secrets.YANDEX_CLOUD_ID }}"
+            -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" \
+            -var="yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}"
