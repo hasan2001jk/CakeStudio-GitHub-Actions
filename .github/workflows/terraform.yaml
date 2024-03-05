@@ -17,19 +17,23 @@ jobs:
           tofu_version: 1.6.2
 
       - name: OpenTofu fmt
+        working-directory: ./application
         id: fmt
         run: tofu fmt -check
         continue-on-error: true 
 
       - name: OpenTofu Init
+        working-directory: ./application
         id: init
         run: tofu init
       
       - name: OpenTofu Validate
+        working-directory: ./application
         id: validate
         run: tofu validate -no-color
 
       - name: OpenTofu Plan
+        working-directory: ./application
         id: plan
         run: tofu plan -no-color
         continue-on-error: true
@@ -73,6 +77,7 @@ jobs:
 
                 
       - name: OpenTofu Apply
+        working-directory: ./application
         id: apply
         run: tofu apply -auto-approve \
             -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" \
