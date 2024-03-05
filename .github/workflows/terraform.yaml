@@ -79,7 +79,4 @@ jobs:
       - name: OpenTofu Apply
         working-directory: ./provisioning
         id: apply
-        run: tofu apply -auto-approve \
-            -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" \
-            -var="yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}" \
-            -var="ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }}" 
+        run: tofu apply -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" -var="yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}" -var="ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }}" 
