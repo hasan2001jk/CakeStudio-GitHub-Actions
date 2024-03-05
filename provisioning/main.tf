@@ -95,7 +95,13 @@ resource "yandex_vpc_subnet" "subnet-1" {
     v4_cidr_blocks = ["10.2.0.0/16"]
 }
 
+variable "yandex_token" {
+  description = "Yandex Cloud token"
+}
 
+variable "yandex_cloud_id" {
+  description = "Yandex Cloud ID"
+}
 
 
 resource "local_file" "inventory_tmpl" {
