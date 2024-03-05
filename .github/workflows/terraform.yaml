@@ -80,3 +80,13 @@ jobs:
         working-directory: ./provisioning
         id: apply
         run: tofu apply -auto-approve -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" -var="yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}" -var="ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }}" 
+
+      - name: OpenTofu Apply
+        working-directory: ./configuring
+        run: |
+          ls -lart
+          cat inventory
+
+      - name: Destroy Infrastructure
+        working-directory: ./provisioning
+        run: tofu destroy -auto-approve
