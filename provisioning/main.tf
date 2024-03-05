@@ -4,6 +4,22 @@ terraform {
       source = "yandex-cloud/yandex"
     }
   }
+
+  backend "s3" {
+    endpoints = {
+      s3 = "https://storage.yandexcloud.net"
+    }
+    bucket = "my-tf-log-bucket"
+    region = "ru-central1"
+    key    = "terraform.tfstate"
+
+    skip_region_validation      = true
+    skip_credentials_validation = true
+    skip_requesting_account_id  = true # Необходимая опция Terraform для версии 1.6.1 и старше.
+    skip_s3_checksum            = true # Необходимая опция при описании бэкенда для Terraform версии 1.6.3 и старше.
+
+  }
+
 }
  
 provider "yandex" {
@@ -83,6 +99,43 @@ resource "yandex_compute_instance" "k8sworker" {
 }
 
 
+# SonarQube Server
+resource "yandex_compute_instance" "sonarqube" {
+  name                      = "sonarqube"
+  allow_stopping_for_update = "true"
+
+  platform_id = "standard-v1"
+
+  boot_disk {
+    initialize_params {
+      image_id = var.image-id
+      size     = 50
+    }
+
+  }
+
+  resources {
+    core_fraction = 5
+    cores         = 4
+    memory        = 4
+  }
+
+  network_interface {
+    subnet_id = yandex_vpc_subnet.subnet-1.id
+    nat       = true
+  }
+
+
+  metadata = {
+    ssh-keys = "ubuntu:${var.ssh_public_key}"
+  }
+
+}
+
+
+
+
+
 resource "yandex_vpc_network" "network-1" {
     name = "from-terraform-network"
 } 
@@ -112,6 +165,7 @@ resource "local_file" "inventory_tmpl" {
     {
       master_node_external_ip = yandex_compute_instance.k8smaster.network_interface.0.nat_ip_address
       worker_node_external_ip = yandex_compute_instance.k8sworker.network_interface.0.nat_ip_address
+      sonarqube_node_external_ip = yandex_compute_instance.sonarqube.network_interface.0.nat_ip_address
     }
   )
   filename = "../configuring/inventory"
