@@ -41,7 +41,7 @@ resource "yandex_compute_instance" "k8smaster" {
 
 
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "ubuntu:${var.ssh_public_key}"
   }
 
 }
@@ -77,7 +77,7 @@ resource "yandex_compute_instance" "k8sworker" {
 
 
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "ubuntu:${var.ssh_public_key}"
   }
 
 }
@@ -103,6 +103,9 @@ variable "yandex_cloud_id" {
   description = "Yandex Cloud ID"
 }
 
+variable "ssh_public_key" {
+  description = "SHH Public Key"
+}
 
 resource "local_file" "inventory_tmpl" {
   content = templatefile("${path.module}/templates/inventory.tpl",
