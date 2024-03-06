@@ -38,7 +38,7 @@ jobs:
       # Run a Tofu fmt to check syntax
     - name: Tofu Format
       id: fmt
-      run: tofu fmt 
+      run: tofu fmt -check
 
     # Run a Tofu validate
     - name: Tofu Validate
