@@ -35,6 +35,9 @@ jobs:
       id: init
       run: tofu init -backend-config="access_key=${{ secrets.ACCESS_KEY }}" -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
 
+    - name: Tofu Format
+      run: tofu fmt
+
       # Run a Tofu fmt to check syntax
     - name: Tofu Format
       id: fmt
