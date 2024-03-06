@@ -51,7 +51,7 @@ jobs:
           
     - name: OpenTofu Apply
       id: apply
-      run: tofu apply -auto-approve -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" -var="yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}" -var="ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }}" tfplan
+      run: tofu apply -auto-approve tfplan
 
     - name: Destroy Infrastructure
       run: tofu destroy -auto-approve -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" -var="yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}" -var="ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }}"
