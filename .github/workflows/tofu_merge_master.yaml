@@ -7,7 +7,7 @@ on:
 
 
 jobs: 
-  check-code-and-plan-and-apply:
+  check_code:
     runs-on: ubuntu-latest
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     # Set the working directory to ./provisioning for the config files
@@ -44,16 +44,58 @@ jobs:
       # Run even if formatting fails
       if: success() || failure()
       run: tofu validate -no-color
-      
-    - name: OpenTofu Plan
-      id: plan
-      run: tofu plan -no-color -out=tfplan -var yandex_token=${{ secrets.YANDEX_TOKEN }} -var yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }} -var ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }} 
+        
+  plan:
+    runs-on: ubuntu-latest
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    # Set the working directory to ./provisioning for the config files
+    defaults:
+        run:
+          shell: bash
+          working-directory: ./provisioning
+    needs: check_code
+    steps:
+      - name: OpenTofu Plan
+        id: plan
+        run: tofu plan -no-color -out=tfplan -var yandex_token=${{ secrets.YANDEX_TOKEN }} -var yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }} -var ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }} 
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: ./tfplan
+          
+  apply:
+    runs-on: ubuntu-latest
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    # Set the working directory to ./provisioning for the config files
+    defaults:
+        run:
+          shell: bash
+          working-directory: ./provisioning
+    needs: plan
+    steps:
     # On merge to master apply changes
+
+  
+    - uses: actions/download-artifact@v4
+      with:
+        name: tfplan
+        path: ./tfplan
+        
     - name: OpenTofu Apply
       id: apply
-      run: tofu apply -auto-approve -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" -var="yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}" -var="ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }}" 
+      run: tofu apply -auto-approve -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" -var="yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}" -var="ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }}" tfplan
 
+  destroy:
+    runs-on: ubuntu-latest
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    # Set the working directory to ./provisioning for the config files
+    defaults:
+        run:
+          shell: bash
+          working-directory: ./provisioning
+    needs: apply
+    steps:
     - name: Destroy Infrastructure
       run: tofu destroy -auto-approve -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" -var="yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}" -var="ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }}"
           
