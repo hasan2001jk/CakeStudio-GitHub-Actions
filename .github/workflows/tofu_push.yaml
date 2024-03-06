@@ -34,7 +34,8 @@ jobs:
     - name: OpenTofu Init
       id: init
       run: tofu init -backend-config="access_key=${{ secrets.ACCESS_KEY }}" -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
-
+      
+      # Format the code
     - name: Tofu Format
       run: tofu fmt
 
