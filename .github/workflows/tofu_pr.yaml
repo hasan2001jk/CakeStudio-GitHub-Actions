@@ -13,7 +13,7 @@ env:
 
  
 jobs: 
-  check-code-and-plan:
+  plan:
     runs-on: ubuntu-latest
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     # Set the working directory to ./provisioning for the config files
