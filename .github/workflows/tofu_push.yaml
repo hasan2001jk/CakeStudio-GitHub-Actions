@@ -1,0 +1,48 @@
+name: Push to feature branch
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!main'
+
+env:
+  TF_LOG: INFO
+  TF_INPUT: false
+
+
+ 
+jobs: 
+  check-code:
+    runs-on: ubuntu-latest
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    # Set the working directory to ./provisioning for the config files
+    defaults:
+        run:
+          shell: bash
+          working-directory: ./provisioning
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Setup OpenTofu
+      uses: opentofu/setup-opentofu@v1
+      with:
+        tofu_version: 1.6.2
+
+    - name: OpenTofu Init
+      id: init
+      run: tofu init -backend-config="access_key=${{ secrets.ACCESS_KEY }}" -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
+
+      # Run a Tofu fmt to check syntax
+    - name: Tofu Format
+      id: fmt
+      run: tofu fmt -check
+
+    # Run a Tofu validate
+    - name: Tofu Validate
+      id: validate
+      # Run even if formatting fails
+      if: success() || failure()
+      run: tofu validate -no-color
