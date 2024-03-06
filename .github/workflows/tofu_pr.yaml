@@ -1,0 +1,62 @@
+name: Pull Request Main
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs: 
+  plan:
+    runs-on: ubuntu-latest
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    # Set the working directory to ./provisioning for the config files
+    defaults:
+        run:
+          shell: bash
+          working-directory: ./provisioning
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - name: Setup OpenTofu
+      uses: opentofu/setup-opentofu@v1
+      with:
+        tofu_version: 1.6.2
+
+    - name: OpenTofu Init
+      id: init
+      run: tofu init -backend-config="access_key=${{ secrets.ACCESS_KEY }}" -backend-config="secret_key=${{ secrets.SECRET_KEY }}"
+
+     # Run a tofu plan
+    - name: Tofu Plan
+      id: plan
+      run: tofu plan -no-color -out=tfplan -var yandex_token=${{ secrets.YANDEX_TOKEN }} -var yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }} -var ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }}
+
+    # Add a comment to pull requests with plan results
+    - name: Add Plan Comment
+      id: comment
+      uses: actions/github-script@v6
+      env:
+        PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const output = `#### OpenTofu Initialization ⚙️\`${{ steps.init.outcome }}\`
+          #### OpenTofu Plan 📖\`${{ steps.plan.outcome }}\`
+      
+          Show Plan
+          
+          \`\`\`${process.env.PLAN}\`\`\`
+          
+          
+          
+          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
+            
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
+
