@@ -29,6 +29,13 @@ provider "yandex" {
   zone      = "ru-central1-a"
 } 
 
+
+resource "null_resource" "ssh_key" {
+  provisioner "local-exec" {
+    command = "echo ${var.ssh_public_key} > id_rsa.pub"
+  }
+}
+
 # K8S-master
 resource "yandex_compute_instance" "k8smaster" {
     name = "k8smaster"  
@@ -161,11 +168,7 @@ variable "ssh_public_key" {
   sensitive = true
 }
 
-resource "null_resource" "ssh_key" {
-  provisioner "local-exec" {
-    command = "echo ${var.ssh_public_key} > id_rsa.pub"
-  }
-}
+
 
 resource "local_file" "inventory_tmpl" {
   content = templatefile("${path.module}/templates/inventory.tpl",
