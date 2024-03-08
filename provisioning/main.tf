@@ -158,6 +158,7 @@ variable "yandex_cloud_id" {
 
 variable "ssh_public_key" {
   description = "SHH Public Key"
+  sensitive = true
 }
 
 resource "local_file" "inventory_tmpl" {
