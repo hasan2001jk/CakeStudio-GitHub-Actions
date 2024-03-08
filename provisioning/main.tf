@@ -158,10 +158,6 @@ variable "yandex_cloud_id" {
   description = "Yandex Cloud ID"
 }
 
-variable "ssh_public_key" {
-  description = "SHH Public Key"
-  sensitive = true
-}
 
 
 
