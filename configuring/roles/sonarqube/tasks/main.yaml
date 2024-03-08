@@ -1,0 +1,523 @@
+---
+- name: Set a hostname for (SONARQUBE)
+  ansible.builtin.hostname:
+    name: sonarqube
+
+
+#- name: Removed Old Installation (docker)
+#  become: yes
+#  ansible.builtin.package:
+#    name: "{{item}}"
+#    state: absent
+#  loop:
+#    - docker
+
+#- name: Docker CE Requirements (Tools)
+#  become: yes
+#  ansible.builtin.package:
+#    name: "{{ item }}"
+#    state: present
+#    update_cache: yes
+#  loop:
+#    - apt-transport-https
+#    - ca-certificates
+#    - curl
+#    - gnupg
+#    - lsb-release
+
+#- name: Add Docker GPG key
+#  become: yes
+#  ansible.builtin.apt_key:
+#    url: https://download.docker.com/linux/ubuntu/gpg
+#    state: present
+
+#- name: Add Docker repository
+#  become: yes
+#  ansible.builtin.apt_repository:
+#    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+#    state: present
+
+#- name: Wait for unattended upgrades to finish
+#  shell: "pkill -f unattended-upgrades"
+#  ignore_errors: yes
+
+#- name: Install Docker CE
+#  become: yes
+#  ansible.builtin.package:
+#    name: docker-ce
+#    state: present
+#    update_cache: yes
+
+#- name: Install pip
+#  become: yes
+#  apt:
+#    name: python3-pip
+#    state: present
+
+#- name: Install Docker SDK for Python
+#  become: yes
+#  pip:
+#    name: docker
+#    executable: pip3
+
+#- name: "sysctl -w vm.max_map_count=262144"
+#  ansible.posix.sysctl:
+#    name: vm.max_map_count
+#    value: '262144'
+#    sysctl_set: yes
+
+#- name: Create Docker Volume
+#  docker_volume:
+#    name: "{{item}}"
+#    state: present
+#  loop:
+#   - sonarqube_data
+#   - sonarqube_logs
+#   - sonarqube_extensions
+#   - postgresql
+#   - postgresql_data
+
+#  Deploy PostgreSQL container
+#- name: Deploy PostgreSQL container
+#  docker_container:
+#    name: db
+#    image: postgres
+#    env:
+#      POSTGRES_USER: sonar
+#      POSTGRES_PASSWORD: sonar
+#    volumes:
+#      - postgresql:/var/lib/postgresql
+#      - postgresql_data:/var/lib/postgresql/data  # Optional; uncomment if not using a volume driver that supports data directory creation
+#    network_mode: "host"
+#    state: "started"
+
+# Deploy SonarQube container
+#- name: Deploy SonarQube container
+#  docker_container:
+#    name: sonarqube
+#    image: sonarqube:community
+#    env:
+#      SONAR_JDBC_URL: jdbc:postgresql://localhost:5432/sonar
+#      SONAR_JDBC_USERNAME: sonar
+#      SONAR_JDBC_PASSWORD: sonar
+#    volumes:
+#      - sonarqube_data:/opt/sonarqube/data
+#      - sonarqube_extensions:/opt/sonarqube/extensions
+#      - sonarqube_logs:/opt/sonarqube/logs
+#    network_mode: "host"
+#    recreate: true
+#    state: "started"
+#    restart_policy: "unless-stopped"
+
+#- name: "Wait until SonarQube Container is reachable via TCP/IP."
+#  ansible.builtin.wait_for:
+#    host: "localhost"
+#    port: "9000"
+#    state: drained
+#    delay: 5
+#    connect_timeout: 15
+
+
+
+#- name: Check SonarQube to be healthy.
+#  register: sonarqube_health
+#  ansible.builtin.uri:
+#    url: "http://localhost:9000/api/system/health"
+#    user: "admin"
+#    password: "admin"
+#    method: GET
+#    force_basic_auth: yes
+#  until: sonarqube_health.status == 200
+#  retries: 3
+#  delay: 50
+#  ignore_errors: true
+
+#- name: Pause before retrying
+#  ansible.builtin.pause:
+#    seconds: 50
+#  when: sonarqube_health.status != 200
+
+
+- name: Get list of users (with authentication)
+  register: user_list_response
+  ansible.builtin.uri:
+    url: http://localhost:9000/api/users/search
+    method: GET
+    user: "admin"  # Replace with your SonarQube admin username
+    password: "admin"  # Replace with your SonarQube admin password
+    return_content: true
+    force_basic_auth: yes
+
+
+- name: Parse user list response
+  ansible.builtin.set_fact:
+    user_list: "{{ user_list_response.json.users }}"
+
+
+- name: Check if user exists
+  ansible.builtin.set_fact:
+    user_exists: "{{ user_list | selectattr('login', 'equalto', 'hasan2001') | list | length > 0 }}"
+
+- name: Set name of user hasan2001 in a variable
+  ansible.builtin.set_fact:
+    user_name: "{{ user_list | selectattr('login', 'equalto', 'hasan2001') | map(attribute='login') | first }}"
+    user_token_count: "{{ user_list | selectattr('login', 'equalto', 'hasan2001') | map(attribute='tokensCount') | first }}"  # Get the first token count or default to 0
+  when: user_list | selectattr('login', 'equalto', 'hasan2001') | list | length > 0
+  register: user_name_result
+
+- name: Just check cond
+  ansible.builtin.debug:
+    msg: "Evaluating 'user_list' condition: {{ (user_list | selectattr('login', 'equalto', 'hasan2001') | list | length) > 0 }}"
+
+- name: JUst Result
+  ansible.builtin.debug:
+    msg: "user_name_result content: {{ user_name_result }}" # Optional message for clarity
+
+- debug:
+    msg: "user_exists is: {{ user_exists }}"
+  loop: "{{ user_list }}"
+  when: item.login == 'hasan2001'
+  loop_control:
+    pause: 0
+    label: "{{ item }}"
+
+- name: Check tokenCount for user hasan2001
+  debug:
+    msg: "User hasan2001 token count: {{ item.tokensCount }}"
+  loop: "{{ user_list }}"
+  when: item.login == 'hasan2001'
+  loop_control:
+    pause: 0
+    label: "{{ item }}"
+
+- name: Create CI User
+  ansible.builtin.uri:
+    url: "http://localhost:9000/api/users/create?local=true&login=hasan2001&name=hasan&password=admin"
+    user: "admin"
+    password: "admin"
+    method: POST
+    force_basic_auth: yes
+  when: not user_exists
+
+
+- name: Create CI User Token.
+  ansible.builtin.uri:
+    url: "http://localhost:9000/api/user_tokens/generate?login={{ user_name | default('hasan2001') | urlencode }}&name=github"
+    user: "{{ user_name | default('hasan2001') }}"
+    password: "admin"
+    method: POST
+    force_basic_auth: yes
+  register: token_response
+  when: user_name_result.skipped is defined or (user_name_result.skipped is not defined and user_token_count | int == 0)
+
+
+- name: Token Response
+  ansible.builtin.debug:
+    msg: "token_response content: {{ token_response }}" # Optional message for clarity
+
+
+- name: Get organization secrets
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/hasan2001jk/CakeStudio-GitHub-Actions/actions/secrets"
+    headers:
+      Accept: application/vnd.github+json
+      Authorization: "Bearer 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"
+      X-GitHub-Api-Version: 2022-11-28
+  register: org_secrets
+
+- name: Debug organization secrets
+  debug:
+    var: org_secrets
+  when: org_secrets is succeeded
+
+- name: Get GitHub organization public key for secrets
+  ansible.builtin.uri:
+    url: "https://api.github.com/repos/hasan2001jk/CakeStudio-GitHub-Actions/actions/secrets/public-key"
+    headers:
+      Accept: "application/vnd.github.v3+json"
+      Authorization: "Bearer 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"
+      X-GitHub-Api-Version: "2022-11-28"
+  register: github_key
+
+- name: Debug GitHub public key
+  debug:
+    var: github_key
+  when: github_key is succeeded
+
+- debug:
+    msg: "token_response.skipped is defined: {{ token_response.skipped is defined }}"
+
+- name: Update organization secret
+  ansible.builtin.uri:
+    method: PUT
+    url: "https://api.github.com/repos/hasan2001jk/CakeStudio-GitHub-Actions/actions/secrets/SONAR_TOKEN_SONARQUBE"
+    headers:
+      Accept: application/vnd.github+json
+      Authorization: "Bearer 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"
+      X-GitHub-Api-Version: 2022-11-28
+    body:
+      encrypted_value: "{{ token_response.json.token | ansible.builtin.b64encode }}"   # encoded secret value
+      key_id: "{{ github_key.json.key_id }}"
+    body_format: json
+  register: updated_secret
+  when: token_response.skipped is not defined
+  failed_when: "{{ updated_secret.status not in [201, 204] }}"
+  changed_when: false
+
+- name: Debug updated secret (optional)
+  debug:
+    var: updated_secret
+  when: updated_secret is succeeded
+
+
+- name: Check for existing projects
+  ansible.builtin.uri:
+    url: "http://localhost:9000/api/projects/search"
+    user: "admin"
+    password: "admin"
+    method: GET
+    force_basic_auth: yes
+    return_content: yes
+  register: existing_projects
+
+- debug:
+    var: existing_projects
+  when: existing_projects.status == 200
+
+- name: Find project by name
+  set_fact:
+    project_found: "{{ existing_projects.json.components | selectattr('name', 'eq', 'CakeStudio') }}"
+  when: existing_projects.status == 200
+
+- debug:
+    msg: "project_found: {{ project_found }}"
+
+
+- name: Find project_key if project exists
+  set_fact:
+    project_key: "{{ project_found | map(attribute='key') | first }}"
+  when: existing_projects.status == 200 and project_found | length > 0
+
+- debug:
+    msg: "project_key: {{ project_key }}"
+  when: project_found | length > 0
+
+- debug:
+    msg: "project_found | length == 0 : {{ project_found | length == 0 }}"
+
+
+
+
+#- name: Change Password of new admin user.
+#  register: change_password_result
+#  ansible.builtin.uri:
+#    url: "http://localhost:9000/api/users/change_password?login={{ user_name | default('hasan2001') | urlencode }}&password=hasan2001&previousPassword=admin"
+#    user: "admin"
+#    password: "admin"
+#    method: POST
+#    force_basic_auth: yes
+#  when: permission_result is succeeded
+#  failed_when: "{{ change_password_result.status not in [201, 204] }}"
+#  changed_when: false
+
+- name: Create project if not found
+  ansible.builtin.uri:
+    url: "http://localhost:9000/api/projects/create"
+    method: POST
+    user: "admin"
+    password: "admin"
+    force_basic_auth: yes
+    body_format: form-urlencoded
+    body:
+      name: "CakeStudio"
+      # Optional parameters (adjust as needed)
+      # mainBranch: "develop"
+      newCodeDefinitionType: "PREVIOUS_VERSION"
+      # newCodeDefinitionValue: ""
+      project: "CakeStudio"  # Should not be needed if created
+      visibility: "public"
+  when: project_found | length == 0
+  register: created_project
+
+- debug:
+    var: created_project
+  when: created_project is defined
+
+
+
+- name: Add user permissions to SonarQube
+  register: permission_result
+  ansible.builtin.uri:
+    url: "http://localhost:9000/api/permissions/add_user"
+    user: "admin"  # Replace with your username with 'Administer System' permission
+    password: "admin"  # Replace with your password
+    method: POST
+    force_basic_auth: yes
+    body_format: form-urlencoded
+    body:
+      login: "hasan2001"
+      permission: "admin"  # Adjust the permission according to your requirements
+      #projectId: "ce4c03d6-430f-40a9-b777-ad877c00aa4d"  # Optional, if adding project-specific permission
+      projectKey: "{{ created_project.json.project.key  }}"  # Optional, if adding project-specific permission
+  when: created_project.skipped is not defined
+  failed_when: "{{ permission_result.status not in [201, 204] }}"
+  changed_when: false
+
+
+- name: Update organization secret
+  ansible.builtin.uri:
+    method: PUT
+    url: "https://api.github.com/repos/hasan2001jk/CakeStudio-GitHub-Actions/actions/secrets/PROJECT_KEY"
+    headers:
+      Accept: application/vnd.github+json
+      Authorization: "Bearer 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"
+      X-GitHub-Api-Version: 2022-11-28
+    body:
+      encrypted_value: "{{ created_project.json.project.key | ansible.builtin.b64encode }}"   # encoded secret value
+      key_id: "{{ github_key.json.key_id }}"
+    body_format: json
+  register: updated_secret
+  when: created_project.skipped is not defined
+  failed_when: "{{ updated_secret.status not in [201, 204] }}"
+  changed_when: false
+
+- name: Debug updated secret (optional)
+  debug:
+    var: updated_secret
+  when: updated_secret is succeeded
+
+- name: Update organization secret
+  ansible.builtin.uri:
+    method: PUT
+    url: "https://api.github.com/repos/hasan2001jk/CakeStudio-GitHub-Actions/actions/secrets/PROJECT_NAME"
+    headers:
+      Accept: application/vnd.github+json
+      Authorization: "Bearer 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"
+      X-GitHub-Api-Version: 2022-11-28
+    body:
+      encrypted_value: "{{ created_project.json.project.name | ansible.builtin.b64encode }}"   # encoded secret value
+      key_id: "{{ github_key.json.key_id }}"
+    body_format: json
+  register: updated_secret
+  when: created_project.skipped is not defined
+  failed_when: "{{ updated_secret.status not in [201, 204] }}"
+
+- name: Debug updated secret (optional)
+  debug:
+    var: updated_secret
+  when: updated_secret is succeeded
+
+
+- name: Create Quality Gate
+  ansible.builtin.uri:
+    url: "http://localhost:9000/api/qualitygates/create"
+    method: POST
+    user: "admin"  # Replace with your username
+    password: "admin"  # Replace with your password
+    body_format: form-urlencoded
+    force_basic_auth: yes
+    body:
+      name: "{{ created_project.json.project.name }}"
+  register: quality_gate
+  when: created_project.skipped is not defined
+
+
+- debug:
+    msg: "Quality Gate creation response: {{ quality_gate.json }}"
+  when: quality_gate.skipped is not defined
+
+
+
+- name: Show Quality Gate Details
+  ansible.builtin.uri:
+    url: "http://localhost:9000/api/qualitygates/show"
+    user: "admin"  # Replace with your SonarQube username
+    password: "admin"  # Replace with your SonarQube password
+    method: GET
+    body_format: form-multipart
+    force_basic_auth: yes
+    body:
+      name: "{{ quality_gate.json.name }}"  # Replace with the name of the quality gate you want to display details for
+  register: show_quality_gate
+  when: quality_gate.skipped is not defined
+
+- debug:
+    msg: "Quality Gate Show response: {{ show_quality_gate.json }}"
+  when: show_quality_gate.skipped is not defined
+
+- name: Update Quality Gate Condition
+  ansible.builtin.uri:
+    url: "http://localhost:9000/api/qualitygates/update_condition"
+    method: POST
+    user: "admin"  # Replace with your username
+    password: "admin"  # Replace with your password
+    body_format: form-multipart
+    force_basic_auth: yes
+    body:
+      id: "{{ show_quality_gate.json.conditions | selectattr('metric', 'eq', 'new_coverage') | map(attribute='id') | first }}"  # Accessing the 'id' attribute of the first item in the 'conditions' list
+      error: "40"  # New threshold value (replace with desired value)
+      op: "LT"  # Operator (replace with desired operator if needed)
+      metric: "new_coverage"
+  register: update_condition
+  when: quality_gate.skipped is not defined
+
+- debug:
+    msg: "Quality Gate Update response: {{ update_condition.json }}"
+  when: update_condition.skipped is not defined
+
+
+- name: Associate a project to a quality gate.
+  ansible.builtin.uri:
+    url: "http://localhost:9000/api/qualitygates/select"
+    method: POST
+    user: "admin"  # Replace with your username
+    password: "admin"  # Replace with your password
+    body_format: form-urlencoded
+    force_basic_auth: yes
+    body:
+      gateName: "{{ show_quality_gate.json.name }}"
+      projectKey: "{{ created_project.json.project.key }}"
+  register: associate_gate
+  when: quality_gate.skipped is not defined and created_project.skipped is not defined
+  failed_when: "{{ associate_gate.status not in [204] }}"
+  changed_when: false
+
+- debug:
+    msg: "Association of project to Quality Gate: {{ associate_gate }}"
+  when: associate_gate.skipped is not defined
+
+
+- name: Get public IP address
+  ansible.builtin.shell:
+    cmd: "curl -s ifconfig.me"
+  register: public_ip_result
+
+- name: Construct URL with public IP address
+  ansible.builtin.set_fact:
+    sonarqube_url: "http://{{ public_ip_result.stdout }}:9000"
+
+- debug:
+    msg: "Public IP is: {{ sonarqube_url }}"
+  when: sonarqube_url.skipped is not defined
+
+
+- name: Update organization variable
+  ansible.builtin.uri:
+    method: POST
+    url: "https://api.github.com/repos/hasan2001jk/CakeStudio-GitHub-Actions/actions/variables"
+    headers:
+      Accept: application/vnd.github+json
+      Authorization: "Bearer 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"
+      X-GitHub-Api-Version: 2022-11-28
+    body:
+      name: "SONAR_HOST_URL"   # Concatenate IP and port
+      value: "{{ sonarqube_url }}"
+    body_format: json
+  register: updated_secret
+  when: public_ip_result is succeeded
+  failed_when: "{{ updated_secret.status not in [201, 204] }}"
+
+- name: Debug updated secret (optional)
+  debug:
+    var: updated_secret
+  when: updated_secret is succeeded
