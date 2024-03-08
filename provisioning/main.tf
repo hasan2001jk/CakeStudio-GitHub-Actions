@@ -30,11 +30,6 @@ provider "yandex" {
 } 
 
 
-resource "null_resource" "ssh_key" {
-  provisioner "local-exec" {
-    command = "echo ${var.ssh_public_key} > id_rsa.pub"
-  }
-}
 
 # K8S-master
 resource "yandex_compute_instance" "k8smaster" {
@@ -64,7 +59,7 @@ resource "yandex_compute_instance" "k8smaster" {
 
 
   metadata = {
-    ssh-keys = "ubuntu:${file("./id_rsa.pub")}"
+    ssh-keys = "ubuntu:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDLc9h3DFb2ZWKDP/mS7GBA5JT5Da3Pd3zfoMgrHoaA7WkJkHfysJa6JeW+apSi+ob9bEcAJjK+DEzaPKltiVvIwwGD5ip7d/UOEJgodi1PVQsYusjt81/zUi8+UT308Izi4y1DxQhm3zIJI2R11Nk5iA1hZa7WuZFFxfocYVCirv/tqOHEwZwgGW7Qc4Qb/wyOYtERkK47pAsI05QrkMiiWdEfQlkfP8GquEBpjDmxSWE5/bc/w4tRUWAEIIv45RKiuY77ODJfAZMfLgphmuz5rrIdO9DvO74rkM41LAJUJG+h5HicZprUdef83AAIJTB7iZw2GWZYHw5Aiw3EAEfDHYloyWKT1ZgenhfbW/BBGmxm+SBOzyYIYrP9o67ut41PKXHnctlIZAIAq0DQ5eE9e9njWDVi/sXWsP52MGVmihRYtM/dGlv3PfY4VxfVLIN3iGWwdLnA7rgOBi7Ztw+fXGg0Yv63me4OWhGbvFXPdUy1a79XxMRjfzz+oRE2FHk= root@st17-HP-EliteDesk-800-G1-SFF"
   }
 
 }
@@ -100,7 +95,7 @@ resource "yandex_compute_instance" "k8sworker" {
 
 
   metadata = {
-    ssh-keys = "ubuntu:${file("./id_rsa.pub")}"
+    ssh-keys = "ubuntu:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDLc9h3DFb2ZWKDP/mS7GBA5JT5Da3Pd3zfoMgrHoaA7WkJkHfysJa6JeW+apSi+ob9bEcAJjK+DEzaPKltiVvIwwGD5ip7d/UOEJgodi1PVQsYusjt81/zUi8+UT308Izi4y1DxQhm3zIJI2R11Nk5iA1hZa7WuZFFxfocYVCirv/tqOHEwZwgGW7Qc4Qb/wyOYtERkK47pAsI05QrkMiiWdEfQlkfP8GquEBpjDmxSWE5/bc/w4tRUWAEIIv45RKiuY77ODJfAZMfLgphmuz5rrIdO9DvO74rkM41LAJUJG+h5HicZprUdef83AAIJTB7iZw2GWZYHw5Aiw3EAEfDHYloyWKT1ZgenhfbW/BBGmxm+SBOzyYIYrP9o67ut41PKXHnctlIZAIAq0DQ5eE9e9njWDVi/sXWsP52MGVmihRYtM/dGlv3PfY4VxfVLIN3iGWwdLnA7rgOBi7Ztw+fXGg0Yv63me4OWhGbvFXPdUy1a79XxMRjfzz+oRE2FHk= root@st17-HP-EliteDesk-800-G1-SFF"
   }
 
 }
@@ -134,7 +129,7 @@ resource "yandex_compute_instance" "sonarqube" {
 
 
   metadata = {
-    ssh-keys = "ubuntu:${file("./id_rsa.pub")}"
+    ssh-keys = "ubuntu:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDLc9h3DFb2ZWKDP/mS7GBA5JT5Da3Pd3zfoMgrHoaA7WkJkHfysJa6JeW+apSi+ob9bEcAJjK+DEzaPKltiVvIwwGD5ip7d/UOEJgodi1PVQsYusjt81/zUi8+UT308Izi4y1DxQhm3zIJI2R11Nk5iA1hZa7WuZFFxfocYVCirv/tqOHEwZwgGW7Qc4Qb/wyOYtERkK47pAsI05QrkMiiWdEfQlkfP8GquEBpjDmxSWE5/bc/w4tRUWAEIIv45RKiuY77ODJfAZMfLgphmuz5rrIdO9DvO74rkM41LAJUJG+h5HicZprUdef83AAIJTB7iZw2GWZYHw5Aiw3EAEfDHYloyWKT1ZgenhfbW/BBGmxm+SBOzyYIYrP9o67ut41PKXHnctlIZAIAq0DQ5eE9e9njWDVi/sXWsP52MGVmihRYtM/dGlv3PfY4VxfVLIN3iGWwdLnA7rgOBi7Ztw+fXGg0Yv63me4OWhGbvFXPdUy1a79XxMRjfzz+oRE2FHk= root@st17-HP-EliteDesk-800-G1-SFF"
   }
 
 }
