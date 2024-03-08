@@ -57,7 +57,7 @@ resource "yandex_compute_instance" "k8smaster" {
 
 
   metadata = {
-    ssh-keys = "ubuntu:${var.ssh_public_key}"
+    ssh-keys = "ubuntu:${file("./id_rsa.pub")}"
   }
 
 }
@@ -93,7 +93,7 @@ resource "yandex_compute_instance" "k8sworker" {
 
 
   metadata = {
-    ssh-keys = "ubuntu:${var.ssh_public_key}"
+    ssh-keys = "ubuntu:${file("./id_rsa.pub")}"
   }
 
 }
@@ -127,7 +127,7 @@ resource "yandex_compute_instance" "sonarqube" {
 
 
   metadata = {
-    ssh-keys = "ubuntu:${var.ssh_public_key}"
+    ssh-keys = "ubuntu:${file("./id_rsa.pub")}"
   }
 
 }
@@ -159,6 +159,12 @@ variable "yandex_cloud_id" {
 variable "ssh_public_key" {
   description = "SHH Public Key"
   sensitive = true
+}
+
+resource "null_resource" "ssh_key" {
+  provisioner "local-exec" {
+    command = "echo ${var.ssh_public_key} > id_rsa.pub"
+  }
 }
 
 resource "local_file" "inventory_tmpl" {
