@@ -46,5 +46,9 @@ jobs:
       - name: find inventory
         run: find . -name "inventory"
 
+
+      - name: pwd inventory
+        run: pwd
+
       - name: find inventory
         run: find ~/ -name "inventory"
