@@ -20,3 +20,9 @@
   roles:
     - worker
 
+- name: Setup SonarQube Server
+  hosts: sonarqube
+  become: yes
+  roles:
+    - sonarqube
+
