@@ -33,7 +33,7 @@ jobs:
       #   run: cat ./inventory
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@main
+        uses: ansible/ansible-lint@v24.2.0
 
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
