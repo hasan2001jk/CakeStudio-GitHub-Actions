@@ -55,9 +55,10 @@ jobs:
       
     - name: Uploading the generated inventory file
       uses: actions/upload-artifact@v4
+      working-directory: ./configuring
       with:
         name: Inventory
-        path: ../configuring/inventory
+        path: ./inventory
         overwrite: true
         
         # - name: Destroy Infrastructure
