@@ -30,22 +30,10 @@
     mode: 0755
 
 - name: Download and de-armor Kubernetes signing key
-  get_url:
-    url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key  # Replace with desired version if needed
-    dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-    mode: 0644  # Set appropriate permissions for the key file
+  shell: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 - name: Add Kubernetes repository entry
-  lineinfile:
-    path: /etc/apt/sources.list.d/kubernetes.list
-    state: present
-    create: yes  # Create the file if it doesn't exist
-    line: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /'  # Replace with desired version if needed
-
-- name: Add a key from a file
-  ansible.builtin.apt_key:
-    file: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-    state: present
+  shell: echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 
 - name: Update the system
   package:
