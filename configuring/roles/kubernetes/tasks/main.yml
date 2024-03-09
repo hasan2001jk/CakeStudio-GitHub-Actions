@@ -18,17 +18,37 @@
     state: present
     update_cache: yes
 
-- name: Add Kubernetes gpg key
-  apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    state: present
+# - name: Add Kubernetes gpg key
+#   apt_key:
+#     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+#     state: present
 
-- name: Add Kubernetes software repository
-  apt_repository:
-    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+- name: Create keyrings directory (if needed)
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: 0755
+
+- name: Download and de-armor Kubernetes signing key
+  get_url:
+    url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key  # Replace with desired version if needed
+    dest: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    mode: 0644  # Set appropriate permissions for the key file
+
+- name: Add Kubernetes repository entry
+  lineinfile:
+    path: /etc/apt/sources.list.d/kubernetes.list
     state: present
-    filename: kubernetes.list
-    update_cache: yes
+    create: yes  # Create the file if it doesn't exist
+    line: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /'  # Replace with desired version if needed
+
+
+# - name: Add Kubernetes software repository
+#   apt_repository:
+#     repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+#     state: present
+#     filename: kubernetes.list
+#     update_cache: yes
 
 - name: Install kubernetes
   apt:
