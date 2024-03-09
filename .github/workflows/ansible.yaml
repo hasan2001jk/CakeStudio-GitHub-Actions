@@ -41,6 +41,6 @@ jobs:
         run: ls -la ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring
         
       - name: ls inventory
-        run: cat ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring/inventory
+        run: ls ~/
 
         
