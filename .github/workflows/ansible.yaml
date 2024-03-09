@@ -34,6 +34,16 @@ jobs:
 
       - name: Run ansible-lint
         uses: ansible/ansible-lint@v24.2.0
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          SONAR_JDBC_USERNAME: ${{ secrets.SONAR_JDBC_USERNAME }}
+          SONAR_JDBC_PASSWORD: ${{ secrets.SONAR_JDBC_PASSWORD }}
+          SONAR_USERNAME: ${{ secrets.SONAR_USERNAME }}
+          SONAR_PASSWORD: ${{ secrets.SONAR_PASSWORD }}
+          SONAR_NEW_USER_LOGIN: ${{ secrets.SONAR_NEW_USER_LOGIN }}
+          SONAR_NEW_USER_NAME: ${{ secrets.SONAR_NEW_USER_NAME }}
+          SONAR_NEW_USER_PASSWORD: ${{ secrets.SONAR_NEW_USER_PASSWORD }} 
 
       - name: Run playbook
         uses: dawidd6/action-ansible-playbook@v2
