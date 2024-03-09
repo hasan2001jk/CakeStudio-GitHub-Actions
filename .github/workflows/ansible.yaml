@@ -27,7 +27,7 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: Inventory
+          # name: Inventory
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
 
