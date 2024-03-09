@@ -1,4 +1,4 @@
-name: Merge to Master branch
+name: Deploy The Infrastructure
 
 on:
   push:
