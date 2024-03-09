@@ -23,6 +23,7 @@ jobs:
           workflow: tofu_merge_master.yaml
           search_artifacts: true
           skip_unpack: false
+          path: ./configuring
 
       # - name: Download artifacts
       #   uses: actions/download-artifact@v4
