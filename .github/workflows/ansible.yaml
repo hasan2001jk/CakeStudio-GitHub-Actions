@@ -2,7 +2,10 @@ name: Configuring the Infrastructure
 
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Merge to Master branch"]
+    types:
+      - completed
 
 jobs:
   configure_infrastructure:
