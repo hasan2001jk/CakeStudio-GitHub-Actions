@@ -42,9 +42,9 @@
     create: yes  # Create the file if it doesn't exist
     line: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /'  # Replace with desired version if needed
 
-- name: Add Kubernetes signing key
-  apt_key:
-    url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key  # Replace with desired version if needed
+- name: Add a key from a file
+  ansible.builtin.apt_key:
+    file: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
     state: present
 
 - name: Update the system
