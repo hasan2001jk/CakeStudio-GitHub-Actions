@@ -1,8 +1,9 @@
 name: CI_GitHub_Actions
-on: 
-  push:
-    branches:
-      - master
+on:
+  workflow_run:
+    workflows: ["Configuring the Infrastructure"]
+    types:
+      - completed
 
 
 jobs:
