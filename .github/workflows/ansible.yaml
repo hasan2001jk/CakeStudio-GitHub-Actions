@@ -24,15 +24,13 @@ jobs:
       #     path: ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring
       #     search_artifacts: true
 
-      
-      - name: Download artifact
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: Inventory
-          github-token: ${{ secrets.GITHUB_TOKEN }} # token with actions:read permissions on target repo
-          repository: hasan2001jk/CakeStudio-GitHub-Actions
-          path: ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring
-          run-id: 1234
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
 
       - name: LS folder
         run: ls -lart
