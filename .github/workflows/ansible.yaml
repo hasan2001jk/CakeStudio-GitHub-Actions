@@ -21,16 +21,13 @@ jobs:
         with:
           name: Inventory
           workflow: tofu_merge_master.yaml
-          path: ./
+          path: ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring
           search_artifacts: true
 
       - name: LS folder
         run: ls -lart
 
-      - name: LS folder configuring
-        run: ls -lart ./configuring
-
       - name: cat inventory
-        run: cat ./configuring/inventory
+        run: cat ./inventory
 
         
