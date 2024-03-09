@@ -60,6 +60,9 @@ jobs:
     - name: LS folder configuring
       run: ls -lart ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring
 
+    - name: LS folder configuring
+      run: cat ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring/inventory
+
     # - name: Uploading the generated inventory file
     #   uses: actions/upload-artifact@v4
     #   with:
