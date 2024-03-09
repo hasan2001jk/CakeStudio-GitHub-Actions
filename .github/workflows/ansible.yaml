@@ -3,7 +3,7 @@ name: Configuring the Infrastructure
 
 on:
   workflow_run:
-    workflows: ["Merge to Master branch"]
+    workflows: ["Deploy The Infrastructure"]
     types:
       - completed
 
