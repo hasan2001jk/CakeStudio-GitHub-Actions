@@ -176,7 +176,7 @@
 - debug:
     msg: "user_exists is: {{ user_exists }}"
   loop: "{{ user_list }}"
-  when: item.login == "{{ lookup('env', 'SONAR_NEW_USER_LOGIN') }}"
+  when: item.login == lookup('env', 'SONAR_NEW_USER_LOGIN')
   loop_control:
     pause: 0
     label: "{{ item }}"
