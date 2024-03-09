@@ -185,7 +185,7 @@
   debug:
     msg: "User {{ lookup('env', 'SONAR_NEW_USER_LOGIN') }} token count: {{ item.tokensCount }}"
   loop: "{{ user_list }}"
-  when: item.login == "{{ lookup('env', 'SONAR_NEW_USER_LOGIN') }}"
+  when: item.login == lookup('env', 'SONAR_NEW_USER_LOGIN')
   loop_control:
     pause: 0
     label: "{{ item }}"
