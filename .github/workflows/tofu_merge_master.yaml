@@ -55,7 +55,7 @@ jobs:
       
 
     - name: LS folder configuring
-      run: ls -lart ../../ | pwd
+      run: ls -lart ../../
 
     - name: LS folder configuring
       run: ls -lart ~/work
