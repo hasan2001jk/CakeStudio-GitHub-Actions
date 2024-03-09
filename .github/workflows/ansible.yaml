@@ -43,4 +43,8 @@ jobs:
       - name: ls inventory
         run: ls ~/
 
-        
+      - name: find inventory
+        run: find . -name "inventory"
+
+      - name: find inventory
+        run: find ~/ -name "inventory"
