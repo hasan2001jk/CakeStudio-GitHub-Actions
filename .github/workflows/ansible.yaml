@@ -15,14 +15,24 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         
+      # - name: Download artifact
+      #   id: download-artifact
+      #   uses: dawidd6/action-download-artifact@v2
+      #   with:
+      #     name: Inventory
+      #     workflow: tofu_merge_master.yaml
+      #     path: ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring
+      #     search_artifacts: true
+
+      
       - name: Download artifact
-        id: download-artifact
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: Inventory
-          workflow: tofu_merge_master.yaml
+          github-token: ${{ secrets.GITHUB_TOKEN }} # token with actions:read permissions on target repo
+          repository: hasan2001jk/CakeStudio-GitHub-Actions
           path: ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring
-          search_artifacts: true
+          run-id: 1234
 
       - name: LS folder
         run: ls -lart
