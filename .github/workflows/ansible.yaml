@@ -25,26 +25,17 @@ jobs:
           skip_unpack: false
           path: ./configuring
 
-      # - name: Download artifacts
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     # name: Inventory
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      # - name: ls inventory
+      #   run: cat ./inventory
 
-      - name: LS folder
-        run: ls -lart
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@main
 
-        
-      - name: ls inventory
-        run: cat ./inventory
-
-      - name: find inventory
-        run: find . -name "inventory"
-
-
-      - name: pwd inventory
-        run: pwd
-
-      - name: find inventory
-        run: find ~/ -name "inventory"
+      - name: Run playbook
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          playbook: main.yml
+          directory: ./
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          
