@@ -42,7 +42,12 @@
     create: yes  # Create the file if it doesn't exist
     line: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /'  # Replace with desired version if needed
 
-- name: Install dependencies
+- name: Add Kubernetes signing key
+  apt_key:
+    url: https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key  # Replace with desired version if needed
+    state: present
+
+- name: Update the system
   package:
     update_cache: yes
 
