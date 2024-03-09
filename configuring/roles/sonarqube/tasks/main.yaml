@@ -231,7 +231,7 @@
 - name: Use retrieved PAT for login
   ansible.builtin.command: gh auth login --with-token
   args:
-    stdin: "{{ lookup('env', 'GITHUB_TOKEN') }}"
+    stdin: "{{ lookup('env', 'PERSONAL_ACCESS_TOKEN') }}"
 
 - name: List secrets in a specific repository
   ansible.builtin.command:
