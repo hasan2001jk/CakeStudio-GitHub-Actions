@@ -53,13 +53,16 @@ jobs:
       id: apply
       run: tofu apply -auto-approve tfplan
       
-    - name: Uploading the generated inventory file
-      uses: actions/upload-artifact@v4
-      working-directory: ./configuring
-      with:
-        name: Inventory
-        path: ./inventory
-        overwrite: true
+
+    - name: LS folder configuring
+      run: ls -lart /
+
+    # - name: Uploading the generated inventory file
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: Inventory
+    #     path: ./inventory
+    #     overwrite: true
         
         # - name: Destroy Infrastructure
         #   run: tofu destroy -auto-approve -var="yandex_token=${{ secrets.YANDEX_TOKEN }}" -var="yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }}" 
