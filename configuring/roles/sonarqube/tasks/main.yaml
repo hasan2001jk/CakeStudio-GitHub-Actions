@@ -83,8 +83,8 @@
     name: db
     image: postgres
     env:
-      POSTGRES_USER: sonar
-      POSTGRES_PASSWORD: sonar
+      POSTGRES_USER: "{{ lookup('env', 'POSTGRES_USER') }}"
+      POSTGRES_PASSWORD: "{{ lookup('env', 'POSTGRES_PASSWORD') }}"
     volumes:
       - postgresql:/var/lib/postgresql
       - postgresql_data:/var/lib/postgresql/data  # Optional; uncomment if not using a volume driver that supports data directory creation
@@ -98,8 +98,8 @@
     image: sonarqube:community
     env:
       SONAR_JDBC_URL: jdbc:postgresql://localhost:5432/sonar
-      SONAR_JDBC_USERNAME: sonar
-      SONAR_JDBC_PASSWORD: sonar
+      SONAR_JDBC_USERNAME: "{{ lookup('env', 'SONAR_JDBC_USERNAME') }}"
+      SONAR_JDBC_PASSWORD: "{{ lookup('env', 'SONAR_JDBC_PASSWORD') }}"
     volumes:
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_extensions:/opt/sonarqube/extensions
@@ -123,8 +123,8 @@
   register: sonarqube_health
   ansible.builtin.uri:
     url: "http://localhost:9000/api/system/health"
-    user: "admin"
-    password: "admin"
+    user: "{{ lookup('env', 'SONAR_USERNAME') }}"
+    password: "{{ lookup('env', 'SONAR_PASSWORD') }}"
     method: GET
     force_basic_auth: yes
   until: sonarqube_health.status == 200
@@ -143,8 +143,8 @@
   ansible.builtin.uri:
     url: http://localhost:9000/api/users/search
     method: GET
-    user: "admin"  # Replace with your SonarQube admin username
-    password: "admin"  # Replace with your SonarQube admin password
+    user: "{{ lookup('env', 'SONAR_USERNAME') }}"  # Replace with your SonarQube admin username
+    password: "{{ lookup('env', 'SONAR_PASSWORD') }}"  # Replace with your SonarQube admin password
     return_content: true
     force_basic_auth: yes
 
@@ -156,18 +156,18 @@
 
 - name: Check if user exists
   ansible.builtin.set_fact:
-    user_exists: "{{ user_list | selectattr('login', 'equalto', 'hasan2001') | list | length > 0 }}"
+    user_exists: "{{ user_list | selectattr('login', 'equalto', lookup('env', 'SONAR_NEW_USER_LOGIN')) | list | length > 0 }}"
 
-- name: Set name of user hasan2001 in a variable
+- name: Set name of user "{{ lookup('env', 'SONAR_NEW_USER_LOGIN') }}" in a variable
   ansible.builtin.set_fact:
-    user_name: "{{ user_list | selectattr('login', 'equalto', 'hasan2001') | map(attribute='login') | first }}"
-    user_token_count: "{{ user_list | selectattr('login', 'equalto', 'hasan2001') | map(attribute='tokensCount') | first }}"  # Get the first token count or default to 0
-  when: user_list | selectattr('login', 'equalto', 'hasan2001') | list | length > 0
+    user_name: "{{ user_list | selectattr('login', 'equalto', lookup('env', 'SONAR_NEW_USER_LOGIN')) | map(attribute='login') | first }}"
+    user_token_count: "{{ user_list | selectattr('login', 'equalto', lookup('env', 'SONAR_NEW_USER_LOGIN')) | map(attribute='tokensCount') | first }}"  # Get the first token count or default to 0
+  when: user_list | selectattr('login', 'equalto', lookup('env', 'SONAR_NEW_USER_LOGIN')) | list | length > 0
   register: user_name_result
 
 - name: Just check cond
   ansible.builtin.debug:
-    msg: "Evaluating 'user_list' condition: {{ (user_list | selectattr('login', 'equalto', 'hasan2001') | list | length) > 0 }}"
+    msg: "Evaluating 'user_list' condition: {{ (user_list | selectattr('login', 'equalto', lookup('env', 'SONAR_NEW_USER_LOGIN')) | list | length) > 0 }}"
 
 - name: JUst Result
   ansible.builtin.debug:
@@ -176,25 +176,25 @@
 - debug:
     msg: "user_exists is: {{ user_exists }}"
   loop: "{{ user_list }}"
-  when: item.login == 'hasan2001'
+  when: item.login == "{{ lookup('env', 'SONAR_NEW_USER_LOGIN') }}"
   loop_control:
     pause: 0
     label: "{{ item }}"
 
-- name: Check tokenCount for user hasan2001
+- name: Check tokenCount for user "{{ lookup('env', 'SONAR_NEW_USER_LOGIN') }}"
   debug:
-    msg: "User hasan2001 token count: {{ item.tokensCount }}"
+    msg: "User {{ lookup('env', 'SONAR_NEW_USER_LOGIN') }} token count: {{ item.tokensCount }}"
   loop: "{{ user_list }}"
-  when: item.login == 'hasan2001'
+  when: item.login == "{{ lookup('env', 'SONAR_NEW_USER_LOGIN') }}"
   loop_control:
     pause: 0
     label: "{{ item }}"
 
 - name: Create CI User
   ansible.builtin.uri:
-    url: "http://localhost:9000/api/users/create?local=true&login=hasan2001&name=hasan&password=admin"
-    user: "admin"
-    password: "admin"
+    url: "http://localhost:9000/api/users/create?local=true&login={{ lookup('env', 'SONAR_NEW_USER_LOGIN') | urlencode }}&name={{ lookup('env', 'SONAR_NEW_USER_NAME') | urlencode }}&password={{ lookup('env', 'SONAR_NEW_USER_PASSWORD') | urlencode }}"
+    user: "{{ lookup('env', 'SONAR_USERNAME') }}"
+    password: "{{ lookup('env', 'SONAR_PASSWORD') }}"
     method: POST
     force_basic_auth: yes
   when: not user_exists
@@ -202,9 +202,9 @@
 
 - name: Create CI User Token.
   ansible.builtin.uri:
-    url: "http://localhost:9000/api/user_tokens/generate?login={{ user_name | default('hasan2001') | urlencode }}&name=github"
-    user: "{{ user_name | default('hasan2001') }}"
-    password: "admin"
+    url: "http://localhost:9000/api/user_tokens/generate?login={{ lookup('env', 'SONAR_NEW_USER_LOGIN') | urlencode }}&name=github"
+    user: "{{ lookup('env', 'SONAR_NEW_USER_LOGIN') }}"
+    password: "{{ lookup('env', 'SONAR_NEW_USER_PASSWORD') }}"
     method: POST
     force_basic_auth: yes
   register: token_response
@@ -215,23 +215,23 @@
   ansible.builtin.debug:
     msg: "token_response content: {{ token_response }}" # Optional message for clarity
 
-# - name: Install GitHub CLI
-#   become: yes
-#   shell: |
-#     sudo mkdir -p -m 755 /etc/apt/keyrings
-#     sudo wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
-#     sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
-#     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-#     sudo apt update
-#     sudo apt install gh -y
-#   args:
-#     executable: /bin/bash
+- name: Install GitHub CLI
+  become: yes
+  shell: |
+    sudo mkdir -p -m 755 /etc/apt/keyrings
+    sudo wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null
+    sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    sudo apt update
+    sudo apt install gh -y
+  args:
+    executable: /bin/bash
 
 
 - name: Use retrieved PAT for login
   ansible.builtin.command: gh auth login --with-token
   args:
-    stdin: ""
+    stdin: "{{ lookup('env', 'GITHUB_TOKEN') }}"
 
 - name: List secrets in a specific repository
   ansible.builtin.command:
@@ -274,8 +274,8 @@
 - name: Check for existing projects
   ansible.builtin.uri:
     url: "http://localhost:9000/api/projects/search"
-    user: "admin"
-    password: "admin"
+    user: "{{ lookup('env', 'SONAR_USERNAME') }}" 
+    password: "{{ lookup('env', 'SONAR_PASSWORD') }}"  
     method: GET
     force_basic_auth: yes
     return_content: yes
@@ -287,7 +287,7 @@
 
 - name: Find project by name
   set_fact:
-    project_found: "{{ existing_projects.json.components | selectattr('name', 'eq', 'CakeStudio') }}"
+    project_found: "{{ existing_projects.json.components | selectattr('name', 'eq', lookup('env', 'PROJECT_NAME')) }}"
   when: existing_projects.status == 200
 
 - debug:
@@ -311,17 +311,17 @@
   ansible.builtin.uri:
     url: "http://localhost:9000/api/projects/create"
     method: POST
-    user: "admin"
-    password: "admin"
+    user: "{{ lookup('env', 'SONAR_USERNAME') }}"  
+    password: "{{ lookup('env', 'SONAR_PASSWORD') }}"  
     force_basic_auth: yes
     body_format: form-urlencoded
     body:
-      name: "CakeStudio"
+      name: "{{ lookup('env', 'PROJECT_NAME') }}"
       # Optional parameters (adjust as needed)
       # mainBranch: "develop"
       newCodeDefinitionType: "PREVIOUS_VERSION"
       # newCodeDefinitionValue: ""
-      project: "CakeStudio"  # Should not be needed if created
+      project: "{{ lookup('env', 'PROJECT_KEY') }}"  # Should not be needed if created
       visibility: "public"
   when: project_found | length == 0
   register: created_project
@@ -336,13 +336,13 @@
   register: permission_result
   ansible.builtin.uri:
     url: "http://localhost:9000/api/permissions/add_user"
-    user: "admin"  # Replace with your username with 'Administer System' permission
-    password: "admin"  # Replace with your password
+    user: "{{ lookup('env', 'SONAR_USERNAME') }}" 
+    password: "{{ lookup('env', 'SONAR_PASSWORD') }}"  
     method: POST
     force_basic_auth: yes
     body_format: form-urlencoded
     body:
-      login: "hasan2001"
+      login: "{{ lookup('env', 'SONAR_NEW_USER_LOGIN') }}"
       permission: "admin"  # Adjust the permission according to your requirements
       #projectId: "ce4c03d6-430f-40a9-b777-ad877c00aa4d"  # Optional, if adding project-specific permission
       projectKey: "{{ created_project.json.project.key  }}"  # Optional, if adding project-specific permission
@@ -386,8 +386,8 @@
   ansible.builtin.uri:
     url: "http://localhost:9000/api/qualitygates/create"
     method: POST
-    user: "admin"  # Replace with your username
-    password: "admin"  # Replace with your password
+    user: "{{ lookup('env', 'SONAR_USERNAME') }}" 
+    password: "{{ lookup('env', 'SONAR_PASSWORD') }}" 
     body_format: form-urlencoded
     force_basic_auth: yes
     body:
@@ -405,8 +405,8 @@
 - name: Show Quality Gate Details
   ansible.builtin.uri:
     url: "http://localhost:9000/api/qualitygates/show"
-    user: "admin"  # Replace with your SonarQube username
-    password: "admin"  # Replace with your SonarQube password
+    user: "{{ lookup('env', 'SONAR_USERNAME') }}" 
+    password: "{{ lookup('env', 'SONAR_PASSWORD') }}" 
     method: GET
     body_format: form-multipart
     force_basic_auth: yes
@@ -423,8 +423,8 @@
   ansible.builtin.uri:
     url: "http://localhost:9000/api/qualitygates/update_condition"
     method: POST
-    user: "admin"  # Replace with your username
-    password: "admin"  # Replace with your password
+    user: "{{ lookup('env', 'SONAR_USERNAME') }}" 
+    password: "{{ lookup('env', 'SONAR_PASSWORD') }}" 
     body_format: form-multipart
     force_basic_auth: yes
     body:
@@ -444,8 +444,8 @@
   ansible.builtin.uri:
     url: "http://localhost:9000/api/qualitygates/select"
     method: POST
-    user: "admin"  # Replace with your username
-    password: "admin"  # Replace with your password
+    user: "{{ lookup('env', 'SONAR_USERNAME') }}" 
+    password: "{{ lookup('env', 'SONAR_PASSWORD') }}" 
     body_format: form-urlencoded
     force_basic_auth: yes
     body:
