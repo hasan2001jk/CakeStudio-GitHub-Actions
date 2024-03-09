@@ -28,6 +28,6 @@ jobs:
         run: ls -lart
 
       - name: cat inventory
-        run: cat ./inventory
+        run: ls ./
 
         
