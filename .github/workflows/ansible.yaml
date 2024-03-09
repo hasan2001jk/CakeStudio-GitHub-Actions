@@ -21,7 +21,6 @@ jobs:
         with:
           name: Inventory
           workflow: tofu_merge_master.yaml
-          path: ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring
           search_artifacts: true
           skip_unpack: false
 
