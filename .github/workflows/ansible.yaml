@@ -27,7 +27,13 @@ jobs:
       - name: LS folder
         run: ls -lart
 
-      - name: cat inventory
-        run: ls ./
+      - name: ls inventory
+        run: ls -la ./
+
+      - name: ls inventory
+        run: ls -la ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring
+        
+      - name: ls inventory
+        run: cat ~/work/CakeStudio-GitHub-Actions/CakeStudio-GitHub-Actions/configuring/inventory
 
         
