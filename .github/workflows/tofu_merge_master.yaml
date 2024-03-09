@@ -58,7 +58,7 @@ jobs:
       run: ls -lart ../../ | pwd
 
     - name: LS folder configuring
-      run: ls -lart ~/work | pwd
+      run: ls -lart ~/work
 
     # - name: Uploading the generated inventory file
     #   uses: actions/upload-artifact@v4
