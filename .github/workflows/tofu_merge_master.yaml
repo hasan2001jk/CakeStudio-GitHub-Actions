@@ -57,6 +57,9 @@ jobs:
     - name: LS folder configuring
       run: ls -lart ../../
 
+    - name: LS folder configuring
+      run: ls -lart ~/ 
+
     # - name: Uploading the generated inventory file
     #   uses: actions/upload-artifact@v4
     #   with:
