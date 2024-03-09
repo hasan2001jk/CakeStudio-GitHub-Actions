@@ -7,14 +7,19 @@ on:
 jobs:
   configure_infrastructure:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./configuring
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        
       - name: Download-artifact
         uses: actions/download-artifact@v4
         with:
-          name: Inventory
-          path: ./configuring/inventory
+          name: Inventory 
+          path: ./
 
       - name: LS folder
         run: ls -lart
