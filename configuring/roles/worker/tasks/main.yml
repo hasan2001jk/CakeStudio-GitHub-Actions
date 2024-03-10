@@ -9,5 +9,5 @@
 - name: Join the node to cluster
   command: sh /tmp/join-command.sh
   ignore_errors: yes
-  args:
-    warn: no
+  # args:
+  #   warn: no
