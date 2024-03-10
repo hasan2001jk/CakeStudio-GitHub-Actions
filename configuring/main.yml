@@ -1,4 +1,12 @@
 ---
+- name: Ensure hosts are reachable
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Wait for SSH connection
+      wait_for_connection:
+        timeout: 300  # Adjust timeout value as needed
+        
 - name: Setup Kubernetes Cluster
   hosts: master,worker
   become: yes
