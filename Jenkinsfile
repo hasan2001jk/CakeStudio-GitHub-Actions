@@ -21,7 +21,7 @@ pipeline {
             steps {
                 // Connect to the remote server if ping is successful
                 sh '''
-                    ssh -v user@${master_ip}
+                     "ssh ubuntu@${master_ip}"
                 '''
             }
         }
