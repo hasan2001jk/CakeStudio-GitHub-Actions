@@ -57,7 +57,7 @@ jobs:
           data: '{ "master_ip": "${{ steps.extract_master_ip.outputs.master_ip }}" }'
           verbose: true
           verify_ssl: false
-
+          event_name: 'push'
           
       # - name: Generate HMAC signatures
       #   run: |
