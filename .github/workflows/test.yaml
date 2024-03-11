@@ -22,19 +22,15 @@ jobs:
 
       - name: Extract master IP address
         id: extract_master_ip
-        run: |
-          master_ip=$(awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory)
-          awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory
-          echo "MASTER_IP=${master_ip}" >> $GITHUB_ENV
-          echo "Master IP: $MASTER_IP"
-          echo "MASTER_IP=$MASTER_IP" >> $GITHUB_ENV
+        run: awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory
+        
 
       - name: Send Master IP to Jenkins
         env:
           JENKINS_URL: ${{ secrets.JENKINS_URL }}
           SHARED_SECRET: ${{ secrets.SHARED_SECRET }}
         run: |
-          MASTER_IP="${{ steps.extract_master_ip.outputs.master_ip }}"
+          MASTER_IP="${{ steps.extract_master_ip.outputs }}"
           curl -X POST \
             -H "Content-Type: application/json" \
             -d "{\"master_ip\": \"${MASTER_IP}\"}" \
