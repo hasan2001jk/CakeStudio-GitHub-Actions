@@ -51,7 +51,6 @@ jobs:
       - name: Invoke deployment hook
         uses: distributhor/workflow-webhook@v3
         with:
-          webhook_type: 'json'
           webhook_url: "http://158.160.145.140:8080/github-webhook/"
           webhook_secret: ${{ secrets.JENKINS_WEBHOOK_SECRET }}
           data: '{ "master_ip": "${{ steps.extract_master_ip.outputs.master_ip }}" }'
