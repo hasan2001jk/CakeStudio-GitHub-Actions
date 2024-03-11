@@ -38,10 +38,10 @@ jobs:
           JENKINS_URL: ${{ secrets.JENKINS_URL }}
           SHARED_SECRET: ${{ secrets.SHARED_SECRET }}
         run: |
-          MASTER_IP="${{ steps.extract_master_ip.outputs.master_ip }}"
+          master_ip=$(awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory)
           curl -X POST \
             -H "Content-Type: application/json" \
-            -d "{\"master_ip\": \"${MASTER_IP}\"}" \
+            -d "{\"master_ip\": \"$master_ip\"}" \
             -u "jenkins:${SHARED_SECRET}" \
             "${JENKINS_URL}/github-webhook"
   
