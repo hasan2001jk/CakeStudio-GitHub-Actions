@@ -23,7 +23,8 @@ jobs:
       - name: Extract master IP address
         id: extract_master_ip
         run: |
-          MASTER_IP=$(grep '\[master\]' ./inventory -A 1 | tail -n 1 | awk '{print $3}')
+          master_ip=$(awk '/^\[master\]/ {print $2}' inventory)
+          echo "MASTER_IP=${master_ip}" >> $GITHUB_ENV
           echo "Master IP: $MASTER_IP"
           echo "MASTER_IP=$MASTER_IP" >> $GITHUB_ENV
 
