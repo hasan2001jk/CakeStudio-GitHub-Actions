@@ -24,7 +24,7 @@ jobs:
         id: extract_master_ip
         run: |
           master_ip=$(awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory)
-          echo ${master_ip}
+          echo "master_ip=${master_ip}" >> $GITHUB_OUTPUT
 
       - name: Use master IP address in another step
         run: |
