@@ -1,0 +1,41 @@
+name: TEST
+on: workflow_dispatch
+
+
+jobs:
+  Jenkins:
+    name: Sending to Jenkins
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        id: download-artifact
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          name: Inventory
+          workflow: tofu_merge_master.yaml
+          search_artifacts: true
+          skip_unpack: false
+          path: ./
+
+      - name: ls inventory
+        run: cat ./inventory
+
+      - name: Extract master IP address
+        id: extract_master_ip
+        run: |
+          MASTER_IP=$(grep '\[master\]' inventory.txt -A 1 | tail -n 1 | awk '{print $3}')
+          echo "Master IP: $MASTER_IP"
+          echo "::set-output name=master_ip::$MASTER_IP"
+
+      - name: Send Master IP to Jenkins
+        env:
+          JENKINS_URL: ${{ secrets.JENKINS_URL }}
+          SHARED_SECRET: ${{ secrets.SHARED_SECRET }}
+        run: |
+          MASTER_IP="${{ steps.extract_master_ip.outputs.master_ip }}"
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"master_ip\": \"${MASTER_IP}\"}" \
+            -u "jenkins:${SHARED_SECRET}" \
+            "${JENKINS_URL}/github-webhook"
+  
