@@ -23,7 +23,13 @@ jobs:
       - name: Extract master IP address
         id: extract_master_ip
         run: awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory
-        
+
+      - name: Use master IP address in another step
+        run: |
+          master_ip="${{ steps.extract_master_ip.outputs.master_ip }}"
+          echo ${{ steps.extract_master_ip.outputs.master_ip }}
+          echo ${{ steps.extract_master_ip.outputs }}
+          echo "Master IP: $master_ip"
 
       - name: Send Master IP to Jenkins
         env:
