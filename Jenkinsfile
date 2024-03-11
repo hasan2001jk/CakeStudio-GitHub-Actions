@@ -1,31 +1,34 @@
 pipeline {
-    agent any
+  agent any
 
-        triggers {
-        genericTrigger {
-            genericVariables {
-                genericVariable {
-                    key("extractedField")  // Name for the extracted variable
-                    value("\$.master_ip)  // JSONPath expression to locate the value
-                    expressionType("JSONPath") // Optional, defaults to JSONPath
-                    regexpFilter("")        // Optional, defaults to empty string
-                    defaultValue("")        // Optional, defaults to empty string
-                }
-            }
-        }
-    }
+  triggers {
+    GenericTrigger(
+     genericVariables: [
+      [key: 'ref', value: '$.data.master_ip']
+     ],
 
-    
-    stages {
-        stage('Build') {
-            steps {
-                echo 'Building..'
-                script {
-                    // Access and print the entire payload
-                    def extractedValue = env.extractedField
-                    println "Extracted value: ${extractedValue}"
-                }
-            }
-        }
+     causeString: 'Triggered on $ref',
+
+     printContributedVariables: true,
+     printPostContent: true,
+
+     silentResponse: false,
+     
+     shouldNotFlatten: false,
+
+     regexpFilterText: '$ref',
+     regexpFilterExpression: 'refs/heads/' + BRANCH_NAME
+    )
+  }
+
+
+  stages {
+    stage('Deploy') {
+      steps {
+        sh "echo $ref"
+      }
     }
+  }
+
+}
 }
