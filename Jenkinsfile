@@ -22,7 +22,7 @@ pipeline {
   stages {
     stage('Deploy') {
       steps {
-        sh "echo $master_ip"
+        sh "echo ${master_ip}"
       }
     }
   }
