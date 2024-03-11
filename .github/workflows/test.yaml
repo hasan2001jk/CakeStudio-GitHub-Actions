@@ -23,7 +23,7 @@ jobs:
       - name: Extract master IP address
         id: extract_master_ip
         run: |
-          MASTER_IP=$(grep '\[master\]' inventory.txt -A 1 | tail -n 1 | awk '{print $3}')
+          MASTER_IP=$(grep '\[master\]' ./inventory -A 1 | tail -n 1 | awk '{print $3}')
           echo "Master IP: $MASTER_IP"
           echo "::set-output name=master_ip::$MASTER_IP"
 
