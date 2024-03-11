@@ -42,7 +42,7 @@ jobs:
           echo ${master_ip}
           curl -X POST \
             -H "Content-Type: application/json" \
-            -d "{\"master_ip\": \""'"$master_ip"'"\ "}" \
-            -u "jenkins:"'"$SHARED_SECRET"'"" \
-            ""'"$JENKINS_URL"'"/github-webhook"
+            -d "{\"master_ip\": \"'"$master_ip"'"\ }" \
+            -u "jenkins:"'"$SHARED_SECRET"'" \
+            "http://158.160.145.140:8080/github-webhook/"
   
