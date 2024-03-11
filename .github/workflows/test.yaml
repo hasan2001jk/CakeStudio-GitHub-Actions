@@ -30,7 +30,7 @@ jobs:
           JENKINS_URL: ${{ secrets.JENKINS_URL }}
           SHARED_SECRET: ${{ secrets.SHARED_SECRET }}
         run: |
-          MASTER_IP="${{ steps.extract_master_ip.outputs }}"
+          MASTER_IP="${{ steps.extract_master_ip.outputs.master_ip }}"
           curl -X POST \
             -H "Content-Type: application/json" \
             -d "{\"master_ip\": \"${MASTER_IP}\"}" \
