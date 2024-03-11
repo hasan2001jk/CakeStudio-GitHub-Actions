@@ -22,7 +22,9 @@ jobs:
 
       - name: Extract master IP address
         id: extract_master_ip
-        run: awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory
+        run: |
+          awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory
+          echo "Exit code: $?"
 
       - name: Use master IP address in another step
         run: |
