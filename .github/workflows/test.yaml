@@ -35,8 +35,8 @@ jobs:
 
       - name: Send Master IP to Jenkins
         env:
-          JENKINS_URL: ${{ secrets.JENKINS_URL }}
-          SHARED_SECRET: ${{ secrets.SHARED_SECRET }}
+          JENKINS_URL: ${{ secrets.JENKINS_WEBHOOK_URL }}
+          SHARED_SECRET: ${{ secrets.JENKINS_WEBHOOK_SECRET }}
         run: |
           master_ip=$(awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory)
           echo ${master_ip}
