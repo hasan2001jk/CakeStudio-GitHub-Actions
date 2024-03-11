@@ -20,12 +20,9 @@ pipeline {
      stage('SSH Connection') {
       steps {
         // Connect to the remote server if ping is successful
-        ssh(
-          label: 'ssh-label',
-          credentialsId: 'ssh-credentials-id',
-          command: 'echo "Hello World"',
-          timeout: 10
-        )
+        sshagent(credentials : ['ssh-credentials-id']) {
+            sh 'ssh -o user@${master_ip}'
+            sh 'ssh -v user@${master_ip}'
       }
     }
     stage('Deploy') {
