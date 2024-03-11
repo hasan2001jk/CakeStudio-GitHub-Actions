@@ -35,14 +35,14 @@ jobs:
 
       - name: Send Master IP to Jenkins
         env:
-          JENKINS_IP: ${{ secrets.JENKINS_WEBHOOK_URL }}
+          CD_SERVER: ${{ secrets.JENKINS_WEBHOOK_URL }}
           SHARED_SECRET: ${{ secrets.JENKINS_WEBHOOK_SECRET }}
         run: |
           master_ip=$(awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory)
           echo ${master_ip}
           curl -X POST \
             -H "Content-Type: application/json" \
-            -d "{\"master_ip\": \"'"$master_ip"'" \
+            -d "{\"master_ip\": \"'"$master_ip"'"\ "}" \
             -u "jenkins:"'"$SHARED_SECRET"'" \
-            "'"JENKINS_IP"'"/github-webhook"
+            "'"CD_SERVER"'"/github-webhook"
   
