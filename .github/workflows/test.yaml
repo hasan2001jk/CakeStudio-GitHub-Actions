@@ -48,16 +48,22 @@ jobs:
       #       "http://158.160.145.140:8080/github-webhook/"
   
 
-      - name: Invoke deployment hook
-        uses: distributhor/workflow-webhook@v3
-        with:
-          webhook_url: "http://158.160.145.140:8080/github-webhook/"
-          # webhook_url: "http://158.160.145.140:8080/generic-webhook-trigger/invoke"
-          webhook_secret: ${{ secrets.JENKINS_WEBHOOK_SECRET }}
-          data: '{ "master_ip": "${{ steps.extract_master_ip.outputs.master_ip }}" }'
-          verbose: true
-          verify_ssl: false
-          event_name: 'push'
+      # - name: Invoke deployment hook
+      #   uses: distributhor/workflow-webhook@v3
+      #   with:
+      #     webhook_url: "http://158.160.145.140:8080/github-webhook/"
+      #     # webhook_url: "http://158.160.145.140:8080/generic-webhook-trigger/invoke"
+      #     webhook_secret: ${{ secrets.JENKINS_WEBHOOK_SECRET }}
+      #     data: '{ "master_ip": "${{ steps.extract_master_ip.outputs.master_ip }}" }'
+      #     verbose: true
+      #     verify_ssl: false
+      #     event_name: 'push'
+
+      - name: Trigger Jenkins Build
+        run: |
+          curl -u hasan2001:${{ secrets.JENKINS_TOKEN }} \
+          "${{ secrets.JENKINS_URL }}/job/deploy-jenkins/buildWithParameters?token=${{ secrets.JENKINS_TOKEN }}" \
+          --data-urlencode "master_ip=${{ steps.extract_master_ip.outputs.master_ip }}"
           
       # - name: Generate HMAC signatures
       #   run: |
