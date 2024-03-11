@@ -4,10 +4,10 @@ pipeline {
   triggers {
     GenericTrigger(
      genericVariables: [
-      [key: 'master_ip', value: '$.data.master_ip']
+      [key: 'master_ip', value: '$.master_ip']
      ],
 
-     causeString: 'Triggered on Webhook',
+     causeString: 'Triggered on $master_ip',
 
      printContributedVariables: true,
      printPostContent: true,
