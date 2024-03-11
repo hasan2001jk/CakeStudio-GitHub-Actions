@@ -52,7 +52,7 @@ jobs:
       - name: Generate HMAC signatures
         run: |
           master_ip=$(awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory)
-          payload="{\"master_ip\": \"'"$master_ip"'"\ }"
+          payload="{\"master_ip\": \"${master_ip}\"}"
           signature_sha1=$(echo -n "${payload}" | openssl dgst -sha1 -hmac "${{ secrets.JENKINS_WEBHOOK_SECRET }}" | cut -d ' ' -f 2)
           signature_sha256=$(echo -n "${payload}" | openssl dgst -sha256 -hmac "${{ secrets.JENKINS_WEBHOOK_SECRET }}" | cut -d ' ' -f 2)
           echo "::set-output name=signature_sha1::$signature_sha1"    
