@@ -49,7 +49,7 @@ jobs:
   
 
       - name: Invoke deployment hook
-        uses: distributhor/workflow-webhook@v2
+        uses: distributhor/workflow-webhook@v3
         with:
           webhook_type: 'json-extended'
           webhook_url: "http://158.160.145.140:8080/github-webhook/"
