@@ -1,6 +1,10 @@
 pipeline {
   agent any
 
+parameters {
+        string( name: 'master_ip', defaultValue: '', description: '')
+}
+  
   triggers {
     GenericTrigger(
      genericVariables: [
