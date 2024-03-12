@@ -7,7 +7,7 @@ on:
 
 
 jobs:
-  build:
+  build_analyze:
       name: Build and analyze
       runs-on: ubuntu-latest
       if: ${{ github.event.workflow_run.conclusion == 'success' }}
@@ -43,7 +43,7 @@ jobs:
         - name: Build database image for testing Application
           working-directory: ./application
           run: |
-            docker build -t postgres:v4 -f ./Dockerfile2 .
+            docker build -t postgres:v5 -f ./Dockerfile2 .
         
         - name: Show images
           run : |
@@ -51,7 +51,7 @@ jobs:
         
         - name: Run the image of Database
           run : |
-             docker run -d -p 5432:5432 -e POSTGRES_USER=user -e POSTGRES_PASSWORD=user -e POSTGRES_DB=CakeStudio postgres:v4
+             docker run -d -p 5432:5432 -e POSTGRES_USER=user -e POSTGRES_PASSWORD=user -e POSTGRES_DB=CakeStudio postgres:v5
         
         - name: Generate Maven Wrapper folder
           working-directory: ./application
@@ -102,33 +102,40 @@ jobs:
 
         - name: Build docker image for application
           working-directory: ./application
-          run: docker build -t my_app_img:v4 -f ./Dockerfile1 .
+          run: docker build -t my_app_img:v5 -f ./Dockerfile1 .
 
         - name: Tagging images 
           run: |
-            docker tag postgres:v4 khasanabdurakhmanov/khasanabdurakhmanov-repo:db_v5
-            docker tag my_app_img:v4 khasanabdurakhmanov/khasanabdurakhmanov-repo:app_v5
+            docker tag postgres:v5 khasanabdurakhmanov/khasanabdurakhmanov-repo:db_v5
+            docker tag my_app_img:v5 khasanabdurakhmanov/khasanabdurakhmanov-repo:app_v5
 
         - name: Pushing images to Docker-Hub
           run: |
             docker push khasanabdurakhmanov/khasanabdurakhmanov-repo:db_v5
             docker push khasanabdurakhmanov/khasanabdurakhmanov-repo:app_v5
   Jenkins:
-    name: Sending to Jenkins
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Download artifact
-        id: download-artifact
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          name: Inventory
-          workflow: tofu_merge_master.yaml
-          search_artifacts: true
-          skip_unpack: false
-          path: ./
+      name: Sending to Jenkins
+      runs-on: ubuntu-latest
+      steps:
+        - name: Download artifact
+          id: download-artifact
+          uses: dawidd6/action-download-artifact@v2
+          with:
+            name: Inventory
+            workflow: tofu_merge_master.yaml
+            search_artifacts: true
+            skip_unpack: false
+            path: ./
+  
+        - name: Extract master IP address
+          id: extract_master_ip
+          run: |
+            master_ip=$(awk '/^master.*ansible_host=/ {sub(/.*=/,"",$2); print $2; exit}' inventory)
+            echo "master_ip=${master_ip}" >> $GITHUB_OUTPUT
 
-      - name: ls inventory
-        run: cat ./inventory
+        - name: Trigger Jenkins Build
+          run: | 
+            curl -u ${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }} ${{ secrets.JENKINS_URL }}/job/deploy-jenkins/buildWithParameters?token=${{ secrets.JENKINS_TOKEN }} --data master_ip=${{ steps.extract_master_ip.outputs.master_ip }}
+
+
       
-    
