@@ -37,7 +37,7 @@ jobs:
 
     - name: OpenTofu Plan
       id: plan
-      run: tofu plan -no-color -out=tfplan -var yandex_token=${{ secrets.YANDEX_TOKEN }} -var yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }} -var ssh_public_key=${{ secrets.SHH_PUBLIC_KEY }} 
+      run: tofu plan -no-color -out=tfplan -var yandex_token=${{ secrets.YANDEX_TOKEN }} -var yandex_cloud_id=${{ secrets.YANDEX_CLOUD_ID }} 
 
     # Add a comment to pull requests with plan results
     - name: Add Plan Comment
