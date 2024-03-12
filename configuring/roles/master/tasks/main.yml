@@ -50,6 +50,18 @@
   local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="./join-command"
   become: false
 
+- name: Unarchive Helm binary
+  ansible.builtin.unarchive:
+    src: https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz
+    dest: /usr/local/bin
+    extra_opts: "--strip-components=1"
+    owner: root
+    group: root
+    mode: 0755
+    remote_src: true
+  args:
+    creates: /usr/local/bin/helm
+
 - name: Get facts about cluster membership
   shell: kubectl get nodes
   register: cluster_info
