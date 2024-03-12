@@ -64,15 +64,15 @@ jobs:
           curl -u hasan2001:${{ secrets.JENKINS_TOKEN }} ${{ secrets.JENKINS_URL }}/job/deploy-jenkins/buildWithParameters?token=${{ secrets.JENKINS_TOKEN }} --data master_ip=${{ steps.extract_master_ip.outputs.master_ip }}
 
 
-      - name: Trigger Jenkins Build
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: "${{ secrets.JENKINS_URL }}/job/deploy-jenkins/buildWithParameters"
-          method: 'POST'
-          username: hasan2001
-          password: ${{ secrets.JENKINS_TOKEN }}
-          customHeaders: '{"Content-Type": "application/json"}'
-          data: '{"master_ip": "${{ steps.extract_master_ip.outputs.master_ip }}"}'
+      # - name: Trigger Jenkins Build
+      #   uses: fjogeleit/http-request-action@v1
+      #   with:
+      #     url: "${{ secrets.JENKINS_URL }}/job/deploy-jenkins/buildWithParameters"
+      #     method: 'POST'
+      #     username: hasan2001
+      #     password: ${{ secrets.JENKINS_TOKEN }}
+      #     customHeaders: '{"Content-Type": "application/json"}'
+      #     data: '{"master_ip": "${{ steps.extract_master_ip.outputs.master_ip }}"}'
           
       # - name: Generate HMAC signatures
       #   run: |
