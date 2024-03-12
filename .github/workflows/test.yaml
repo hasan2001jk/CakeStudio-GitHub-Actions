@@ -61,7 +61,7 @@ jobs:
 
       - name: Trigger Jenkins Build
         run: | 
-          curl -u hasan2001:1169a012a281cb74339701cce8310fbf3f http://158.160.130.76:8080/job/deploy-jenkins/buildWithParameters?token=1169a012a281cb74339701cce8310fbf3f --data master_ip=${{ steps.extract_master_ip.outputs.master_ip }}
+          curl -u hasan2001:${{ secrets.JENKINS_TOKEN }} ${{ secrets.JENKINS_URL }}/job/deploy-jenkins/buildWithParameters?token=${{ secrets.JENKINS_TOKEN }} --data master_ip=${{ steps.extract_master_ip.outputs.master_ip }}
 
 
       - name: Trigger Jenkins Build
