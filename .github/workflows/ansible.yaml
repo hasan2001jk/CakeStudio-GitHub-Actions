@@ -33,24 +33,6 @@ jobs:
       - name: GitHub secrets
         run: gh --version
 
-      # - name: ls inventory
-      #   run: cat ./inventory
-
-      # - name: Run ansible-lint
-      #   uses: ansible/ansible-lint@v24.2.0
-      #   with:
-      #     working_directory: ./configuring
-      #   env:
-      #     POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      #     PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      #     POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      #     SONAR_JDBC_USERNAME: ${{ secrets.SONAR_JDBC_USERNAME }}
-      #     SONAR_JDBC_PASSWORD: ${{ secrets.SONAR_JDBC_PASSWORD }}
-      #     SONAR_USERNAME: ${{ secrets.SONAR_USERNAME }}
-      #     SONAR_PASSWORD: ${{ secrets.SONAR_PASSWORD }}
-      #     SONAR_NEW_USER_LOGIN: ${{ secrets.SONAR_NEW_USER_LOGIN }}
-      #     SONAR_NEW_USER_NAME: ${{ secrets.SONAR_NEW_USER_NAME }}
-      #     SONAR_NEW_USER_PASSWORD: ${{ secrets.SONAR_NEW_USER_PASSWORD }} 
 
       - name: Run playbook
         id: ansible-playbook
